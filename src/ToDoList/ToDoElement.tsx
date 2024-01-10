@@ -5,21 +5,55 @@ import {
   faTriangleExclamation,
   faCircleCheck,
   faCircleXmark,
+  faTrashCan,
+  faFilePen,
 } from "@fortawesome/free-solid-svg-icons";
+import ToDoModal from "./ToDoModal.tsx";
 
 interface ToDoElementProps {
+  closeModal: () => void;
+  openModal: boolean;
+  getinfoFromModal: () => void;
   label: {
     label: string;
     priority: string;
     setRemainder: boolean;
-    dateAndTime: string;
+    dateAndTime: number;
+    id: number;
   }[];
   deleteFunction: (item: string) => void;
+  launchEditModal: (param: any) => void;
+  modalEditData: any;
+}
+interface toDoElementState {
+  openModal: boolean;
 }
 
-export default class ToDoElement extends Component<ToDoElementProps> {
+export default class ToDoElement extends Component<
+  ToDoElementProps,
+  toDoElementState
+> {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      openModal: false,
+    };
+  }
+
+  editToDo = (val: any) => {
+    this.props.launchEditModal(val);
+  };
+
+  closeModal = () => {
+    this.setState({ openModal: false });
+  };
+
+  openEditModal = () => {
+    this.props.launchEditModal(this.props.label);
+  };
+
   render() {
-    console.log(this.props.label);
     return (
       <>
         {this.props.label.map((item: any) => {
@@ -28,10 +62,16 @@ export default class ToDoElement extends Component<ToDoElementProps> {
           return (
             <>
               {" "}
-              <section id="to-do-element">
+              <section id="to-do-element" key={item.label}>
                 <span className="date-to-do">{dt.toString()}</span>
                 <span className="to-do-text">{item.label}</span>
                 <span className="priority-to-go">{item.priority}</span>
+                <button
+                  className="edit-to-do"
+                  onClick={() => this.editToDo(item)}
+                >
+                  <FontAwesomeIcon icon={faFilePen} />
+                </button>
                 <span className="date-to-do">
                   <FontAwesomeIcon icon={faTriangleExclamation} />
                 </span>
@@ -40,7 +80,7 @@ export default class ToDoElement extends Component<ToDoElementProps> {
                   onClick={() => this.props.deleteFunction(item)}
                 >
                   {" "}
-                  <FontAwesomeIcon icon={faCircleXmark} />
+                  <FontAwesomeIcon icon={faTrashCan} />
                 </span>
               </section>
             </>

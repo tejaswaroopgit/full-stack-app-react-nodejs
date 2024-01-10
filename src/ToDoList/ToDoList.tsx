@@ -11,11 +11,13 @@ interface toDoState {
     label: string;
     priority: string;
     setRemainder: boolean;
-    dateAndTime: string;
+    dateAndTime: number;
+    id: number;
   }[];
   toogleAddInfo: boolean;
   additionalInfo: string;
   openModal: boolean;
+  modalEditData: any;
 }
 
 export default class ToDoList extends Component<toDoProps, toDoState> {
@@ -26,24 +28,24 @@ export default class ToDoList extends Component<toDoProps, toDoState> {
       list: [
         {
           label: "",
-          priority: "",
-          dateAndTime: "",
-          setRemainder: false,
+          priority: "High",
+          dateAndTime: Date.now(),
+          setRemainder: true,
+          id: Math.random(),
         },
       ],
       toogleAddInfo: false,
       additionalInfo: "",
       openModal: false,
+      modalEditData: {},
     };
   }
 
   openModal = () => {
     this.setState({ openModal: true });
-    console.log("entered the open modal");
   };
 
   onChange = (e: any) => {
-    console.log(e.target.value);
     this.setState({ value: e.target.value });
   };
 
@@ -54,6 +56,7 @@ export default class ToDoList extends Component<toDoProps, toDoState> {
         priority: "low",
         setRemainder: "false",
         dateAndTime: Date.now(),
+        id: Math.floor(Math.random() * 100),
       };
       console.log(newList);
       let finalValue = this.state.list;
@@ -72,29 +75,76 @@ export default class ToDoList extends Component<toDoProps, toDoState> {
   };
 
   closeModal = () => {
-    console.log("opened the close modal function");
     this.setState({ openModal: false });
   };
 
-  addAdditionalInfo = (e) => {
-    this.setState({ toogleAddInfo: e.target.checked });
-    if (e.target.checked) this.openModal();
+  addAdditionalInfo = async (e) => {
+    if (e.target.checked) {
+      const emptyToDoObj = {
+        label: "",
+        priority: "Low",
+        setRemainder: false,
+        dateAndTime: Date.now(),
+        id: Math.floor(Math.random() * 100),
+      };
+      this.setState({
+        modalEditData: emptyToDoObj,
+        toogleAddInfo: e.target.checked,
+      });
+      this.openModal();
+    }
+  };
+
+  updateValues = (val: any): toDoState["list"] => {
+    console.log(val);
+
+    const toDoObj = this.state.list;
+    for (let i = 0; i < toDoObj.length; i++) {
+      if (val.id == toDoObj[i].id) {
+        console.log("entering successs condition");
+        toDoObj[i].dateAndTime = val.dateAndTime;
+        toDoObj[i].label = val.label;
+        toDoObj[i].setRemainder = val.setRemainder;
+        toDoObj[i].priority = val.priority;
+        toDoObj[i].id = val.id;
+        return toDoObj;
+      }
+    }
+    toDoObj.push(val);
+    this.setState({ list: toDoObj });
+    return toDoObj;
   };
 
   getinfoFromModal = (val: any): void => {
-    const value = this.state.list;
-    value.push(val);
+    const value: any = this.updateValues(val);
     this.setState({ list: value });
+    this.closeModal();
+  };
+
+  handleFilterPills = (element: any) => {
+    if (element == "date") {
+      return ".date-sorted active";
+    } else {
+      return ".priority-sorted active";
+    }
+  };
+
+  launchEditModal = (val: any) => {
+    this.setState({ modalEditData: val, openModal: true });
   };
 
   render() {
     return (
       <div className="container-fluid">
-        <ToDoModal
-          closeModal={this.closeModal}
-          openModal={this.state.openModal}
-          getinfoFromModal={this.getinfoFromModal}
-        />
+        {this.state.openModal ? (
+          <ToDoModal
+            closeModal={this.closeModal}
+            openModal={this.state.openModal}
+            getinfoFromModal={this.getinfoFromModal}
+            modalEditData={this.state.modalEditData}
+          />
+        ) : null}
+
         <div>
           <div className="to-do-container">
             <div className="inputToDo">
@@ -120,22 +170,73 @@ export default class ToDoList extends Component<toDoProps, toDoState> {
             <label htmlFor="">Add aditional information</label>
           </div>
         </div>
-        {/* <section data-id="quick-actions-section">
-          <div>
-            quick actions:
-          </div>
-          <div className="">
-            <div className="quick-actions">
-              <div>date</div>
-              <div>priority</div>
-              <div>time</div>
-            </div>
-          </div>
-        </section> */}
+        <section
+          data-id="quick-actions-section"
+          className="quick-actions-section"
+        >
+          <ul className="nav nav-pills">
+            <li className="nav-item">
+              <a
+                className="nav-link active"
+                aria-current="page"
+                href="#"
+                onClick={() => this.handleFilterPills("date")}
+              >
+                Date
+              </a>
+            </li>
+            <li
+              className="nav-item"
+              onClick={() => this.handleFilterPills("priority")}
+            >
+              <a className="nav-link" aria-current="page" href="#">
+                Priority
+              </a>
+            </li>
+            <li className="nav-item dropdown">
+              <a
+                className="nav-link dropdown-toggle"
+                data-bs-toggle="dropdown"
+                href="#"
+                role="button"
+                aria-expanded="false"
+              >
+                All Filters
+              </a>
+              <ul className="dropdown-menu">
+                <li>
+                  <a className="dropdown-item" href="#">
+                    Date
+                  </a>
+                </li>
+                <li>
+                  <a className="dropdown-item" href="#">
+                    Priority
+                  </a>
+                </li>
+                <li>
+                  <a className="dropdown-item" href="#">
+                    Over Due
+                  </a>
+                </li>
+                <li>
+                  <a className="dropdown-item" href="#">
+                    Flagged
+                  </a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </section>
         <section>
           <ToDoElement
+            closeModal={this.closeModal}
+            getinfoFromModal={() => this.getinfoFromModal}
+            launchEditModal={this.launchEditModal}
             label={this.state.list}
             deleteFunction={this.deleteItem}
+            openModal={false}
+            modalEditData={this.state.modalEditData}
           />
         </section>
       </div>

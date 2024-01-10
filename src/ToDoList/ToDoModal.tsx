@@ -12,6 +12,7 @@ interface ToDoModalProps {
   closeModal: () => void;
   openModal: boolean;
   getinfoFromModal: (val: any) => void;
+  modalEditData: any;
 }
 
 interface toDoModalState {
@@ -20,6 +21,7 @@ interface toDoModalState {
     priority: string;
     setRemainder: boolean;
     dateAndTime: string;
+    id: number;
   };
 }
 
@@ -31,10 +33,11 @@ export default class ToDoModal extends Component<
     super(props);
     this.state = {
       toDoObject: {
-        label: "",
-        priority: "",
-        dateAndTime: "",
+        label: props.modalEditData.label,
+        priority: props.modalEditData.priority,
+        dateAndTime: props.modalEditData.dateAndTime,
         setRemainder: false,
+        id: props.modalEditData.id,
       },
     };
   }
@@ -47,11 +50,7 @@ export default class ToDoModal extends Component<
     let val = this.state.toDoObject;
     const element = e.target.name;
     val[element] = e.target.value;
-    const isValid = this.checkStateObjIsEmpty();
-    if (isValid) {
-      console.log("setting state   " + isValid);
-      this.setState({ toDoObject: val });
-    }
+    this.setState({ toDoObject: val });
   };
 
   submit = () => {
@@ -64,15 +63,16 @@ export default class ToDoModal extends Component<
   checkStateObjIsEmpty = (): boolean => {
     const values = Object.values(this.state.toDoObject);
     for (let val in values) {
-      if (values[val] == "") {
+      if (values[val] == "" || values[val] == "off") {
         return false;
       }
     }
-    console.log("entering  the checkStateObj");
     return true;
   };
 
   render() {
+    console.log("props  modal");
+    console.log(this.props);
     return (
       <div>
         <Modal
@@ -99,6 +99,7 @@ export default class ToDoModal extends Component<
                 onChange={(e) => this.saveData(e)}
                 className="addInfo priority-form-controls"
                 id=""
+                value={this.state.toDoObject.label}
               ></textarea>
               <p>
                 <label htmlFor="">Priority level: </label>
@@ -106,6 +107,7 @@ export default class ToDoModal extends Component<
                   name="priority"
                   className="priority-form-controls"
                   onChange={(e) => this.saveData(e)}
+                  value={this.state.toDoObject.priority}
                 >
                   <option value="low">Low</option>
                   <option value="med">Medium</option>
@@ -119,6 +121,7 @@ export default class ToDoModal extends Component<
                   name="dateAndTime"
                   className="priority-form-controls"
                   onChange={(e) => this.saveData(e)}
+                  value={this.state.toDoObject.dateAndTime}
                 />
               </p>
               <p>
@@ -127,6 +130,7 @@ export default class ToDoModal extends Component<
                   type="checkbox"
                   name="setRemainder"
                   onChange={(e) => this.saveData(e)}
+                  checked={this.state.toDoObject.setRemainder}
                 />
               </p>
             </section>

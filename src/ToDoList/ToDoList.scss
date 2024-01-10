@@ -39,7 +39,7 @@
   border: 1px solid gray;
   margin: 2px 0px;
   display: grid;
-  grid-template-columns: 10% auto 5% 5% 5%;
+  grid-template-columns: 10% auto 5% 5% 5% 5%;
 
   .date-to-do {
     padding: 10px;
@@ -49,6 +49,16 @@
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+  .edit-to-do {
+    padding: 10px;
+    background: #0361ca;
+    color: white;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
   }
   .priority-to-go {
     background-color: #d4cfd6;
@@ -105,7 +115,18 @@
 
 .quick-actions {
   display: grid;
-  grid-template-columns: 10% 10% 10%;
-  max-width: 60%;
-  // align-items: center;
+  grid-template-columns: 50% 50%;
+  align-items: center;
+  height: 50px;
+  border: 1px solid gray;
+  background-color: gray;
+  color: #0361ca;
+  font-weight: bold;
+  div {
+    height: 100%;
+  }
+}
+
+.quick-actions-section {
+  margin: 10px 0px 20px 0px;
 }
