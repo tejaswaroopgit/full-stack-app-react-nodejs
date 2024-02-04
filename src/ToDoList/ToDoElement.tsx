@@ -24,6 +24,7 @@ interface ToDoElementProps {
   deleteFunction: (item: string) => void;
   launchEditModal: (param: any) => void;
   modalEditData: any;
+  getEditData: (val: any) => void;
 }
 interface toDoElementState {
   openModal: boolean;
@@ -52,6 +53,10 @@ export default class ToDoElement extends Component<
   openEditModal = () => {
     this.props.launchEditModal(this.props.label);
   };
+  getEditData = (item) => {
+    console.log("onclick to do element");
+    this.props.getEditData(item);
+  };
 
   render() {
     return (
@@ -68,7 +73,7 @@ export default class ToDoElement extends Component<
                 <span className="priority-to-go">{item.priority}</span>
                 <button
                   className="edit-to-do"
-                  onClick={() => this.editToDo(item)}
+                  onClick={() => this.getEditData(item)}
                 >
                   <FontAwesomeIcon icon={faFilePen} />
                 </button>

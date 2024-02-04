@@ -1,12 +1,7 @@
 import Modal from "react-modal";
 import React, { Component } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faExclamation,
-  faTriangleExclamation,
-  faCircleCheck,
-  faCircleXmark,
-} from "@fortawesome/free-solid-svg-icons";
+import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 
 interface ToDoModalProps {
   closeModal: () => void;
@@ -20,7 +15,7 @@ interface toDoModalState {
     label: string;
     priority: string;
     setRemainder: boolean;
-    dateAndTime: string;
+    dateAndTime: number;
     id: number;
   };
 }
@@ -117,7 +112,7 @@ export default class ToDoModal extends Component<
               <p>
                 <label htmlFor="">Date and Time</label>
                 <input
-                  type="datetime-local"
+                  type="date"
                   name="dateAndTime"
                   className="priority-form-controls"
                   onChange={(e) => this.saveData(e)}

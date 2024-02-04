@@ -5,6 +5,7 @@
   -moz-box-shadow: 0px 0px 13px 7px rgba(138, 179, 212, 1);
   box-shadow: 0px 0px 13px 7px rgba(138, 179, 212, 1);
   margin-bottom: 20px;
+  padding: 30px;
 }
 
 .inputToDo {
@@ -129,4 +130,30 @@
 
 .quick-actions-section {
   margin: 10px 0px 20px 0px;
+}
+
+.form-container {
+  .form-input {
+    display: flex;
+  }
+  .form-elements {
+    display: grid;
+    grid-template-columns: 30% 30% 30% auto;
+    padding-top: 30px;
+  }
+}
+
+@media screen and (max-width: 977px) {
+  .form-container {
+    .form-input {
+      display: flex;
+    }
+    .form-elements {
+      display: grid;
+      grid-template-columns: auto;
+      grid-template-rows: 40px 40px 40px;
+      padding-top: 30px;
+      text-align: left;
+    }
+  }
 }

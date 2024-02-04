@@ -1,8 +1,9 @@
 import React, { Component } from "react";
 import "./ToDoList.scss";
-import ToDoModal from "./ToDoModal.tsx";
 import "./modals.scss";
 import ToDoElement from "./ToDoElement.tsx";
+import ToDoForm from "./ToDoForm.tsx";
+import ToDoSort from "./ToDoSort.tsx";
 
 interface toDoProps {}
 interface toDoState {
@@ -18,10 +19,14 @@ interface toDoState {
   additionalInfo: string;
   openModal: boolean;
   modalEditData: any;
+  editToDo: any;
+  isToDoUpdate: boolean;
 }
 
 export default class ToDoList extends Component<toDoProps, toDoState> {
+  getinfoFromModal: void;
   constructor(props: toDoProps) {
+    console.log("constructor initializing");
     super(props);
     this.state = {
       value: "",
@@ -31,13 +36,21 @@ export default class ToDoList extends Component<toDoProps, toDoState> {
           priority: "High",
           dateAndTime: Date.now(),
           setRemainder: true,
-          id: Math.random(),
+          id: Date.now(),
         },
       ],
       toogleAddInfo: false,
+      isToDoUpdate: false,
       additionalInfo: "",
       openModal: false,
       modalEditData: {},
+      editToDo: {
+        label: "",
+        priority: "High",
+        dateAndTime: Date.now(),
+        setRemainder: true,
+        id: Date.now(),
+      },
     };
   }
 
@@ -49,22 +62,15 @@ export default class ToDoList extends Component<toDoProps, toDoState> {
     this.setState({ value: e.target.value });
   };
 
-  addToList = () => {
-    try {
-      const newList: any = {
-        label: this.state.value,
-        priority: "low",
-        setRemainder: "false",
-        dateAndTime: Date.now(),
-        id: Math.floor(Math.random() * 100),
-      };
-      console.log(newList);
-      let finalValue = this.state.list;
-      finalValue.push(newList);
-      this.setState({ list: finalValue });
-    } catch (error) {
-      alert("error saving data" + error);
+  addToList = (data) => {
+    if (this.state.isToDoUpdate) {
+      console.log("inside the update..");
+      this.updateList(data);
+      return;
     }
+    const toDoList = this.state.list;
+    toDoList.push(data);
+    this.setState({ list: toDoList });
   };
 
   deleteItem = (item: String): void => {
@@ -115,9 +121,20 @@ export default class ToDoList extends Component<toDoProps, toDoState> {
     return toDoObj;
   };
 
-  getinfoFromModal = (val: any): void => {
+  updateList = (val: any): void => {
     const value: any = this.updateValues(val);
-    this.setState({ list: value });
+    const formInitialState = {
+      label: "",
+      priority: "Low",
+      setRemainder: false,
+      dateAndTime: Date.now(),
+      id: Date.now(),
+    };
+    this.setState({
+      list: value,
+      isToDoUpdate: false,
+      editToDo: formInitialState,
+    });
     this.closeModal();
   };
 
@@ -133,112 +150,49 @@ export default class ToDoList extends Component<toDoProps, toDoState> {
     this.setState({ modalEditData: val, openModal: true });
   };
 
+  sortByType = (req: string): void => {
+    const unsortedlist: any = this.state.list;
+    let sortedList;
+
+    for (let i = 0; i < unsortedlist.length; i++) {
+      for (let j = 0; j < unsortedlist.length - 1; j++) {
+        if (unsortedlist[i].req < unsortedlist[j].req) {
+          const temp = unsortedlist[i];
+          unsortedlist[i] = unsortedlist[j];
+          unsortedlist[j] = temp;
+        }
+      }
+      console.log("unsortedlist" + req);
+      console.log(unsortedlist);
+    }
+    this.setState({ list: unsortedlist });
+  };
+
+  getEditData = (editToDo) => {
+    console.log(editToDo);
+    this.setState({ editToDo: editToDo, isToDoUpdate: true });
+  };
+
   render() {
     return (
       <div className="container-fluid">
-        {this.state.openModal ? (
-          <ToDoModal
-            closeModal={this.closeModal}
-            openModal={this.state.openModal}
-            getinfoFromModal={this.getinfoFromModal}
-            modalEditData={this.state.modalEditData}
-          />
-        ) : null}
-
-        <div>
-          <div className="to-do-container">
-            <div className="inputToDo">
-              <input
-                id="enterToDo"
-                type="text"
-                onChange={this.onChange}
-                className="enterToDo form-control"
-                placeholder="Add to do list items"
-              />
-              <button
-                className="btn btn-primary labelText"
-                onClick={this.addToList}
-              >
-                Submit
-              </button>
-            </div>
-            <input
-              type="checkbox"
-              className=""
-              onChange={(e) => this.addAdditionalInfo(e)}
-            />{" "}
-            <label htmlFor="">Add aditional information</label>
-          </div>
-        </div>
-        <section
-          data-id="quick-actions-section"
-          className="quick-actions-section"
-        >
-          <ul className="nav nav-pills">
-            <li className="nav-item">
-              <a
-                className="nav-link active"
-                aria-current="page"
-                href="#"
-                onClick={() => this.handleFilterPills("date")}
-              >
-                Date
-              </a>
-            </li>
-            <li
-              className="nav-item"
-              onClick={() => this.handleFilterPills("priority")}
-            >
-              <a className="nav-link" aria-current="page" href="#">
-                Priority
-              </a>
-            </li>
-            <li className="nav-item dropdown">
-              <a
-                className="nav-link dropdown-toggle"
-                data-bs-toggle="dropdown"
-                href="#"
-                role="button"
-                aria-expanded="false"
-              >
-                All Filters
-              </a>
-              <ul className="dropdown-menu">
-                <li>
-                  <a className="dropdown-item" href="#">
-                    Date
-                  </a>
-                </li>
-                <li>
-                  <a className="dropdown-item" href="#">
-                    Priority
-                  </a>
-                </li>
-                <li>
-                  <a className="dropdown-item" href="#">
-                    Over Due
-                  </a>
-                </li>
-                <li>
-                  <a className="dropdown-item" href="#">
-                    Flagged
-                  </a>
-                </li>
-              </ul>
-            </li>
-          </ul>
-        </section>
-        <section>
-          <ToDoElement
-            closeModal={this.closeModal}
-            getinfoFromModal={() => this.getinfoFromModal}
-            launchEditModal={this.launchEditModal}
-            label={this.state.list}
-            deleteFunction={this.deleteItem}
-            openModal={false}
-            modalEditData={this.state.modalEditData}
-          />
-        </section>
+        <ToDoForm
+          onChange={this.onChange}
+          addToList={this.addToList}
+          editData={this.state.editToDo}
+          isUpdate={this.state.isToDoUpdate}
+        />
+        <ToDoSort />
+        <ToDoElement
+          closeModal={this.closeModal}
+          getinfoFromModal={() => this.getinfoFromModal}
+          launchEditModal={this.launchEditModal}
+          label={this.state.list}
+          deleteFunction={this.deleteItem}
+          openModal={false}
+          modalEditData={this.state.modalEditData}
+          getEditData={this.getEditData}
+        />
       </div>
     );
   }
